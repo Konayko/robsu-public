@@ -20,11 +20,7 @@ sensorCorDireita = ColorSensor(Port.S2) # <- Delcara sensor direito
 robo = DriveBase(motorEsquerdo, motorDireito, wheel_diameter=4.70, axle_track=9.80) # <- Declara base do robo
 
 print('executou')
-
 ## -----------------------------------curvas no verde[teste]-------------------------------------------------
-
-c=0
-
 def meiaVoltaDoisVerde():
     robo.straight(0)
     while sensorCorEsquerda.color() != Color.BLACK:
@@ -32,32 +28,25 @@ def meiaVoltaDoisVerde():
 
 #def curva90Esquerda():
 
-#def ajuste_esquerda():
-#    if c==0:
-#        if sensorCorEsquerda.color() == Color.BLACK:
-#            robo.drive(2,-300)
+def ajuste_direita():
+    if sensorCorDireita.color() == Color.BLACK:
+        robo.drive(2, 300)
 
-#def ajuste_direita():
-#    if c==0:
-#        if sensorCorDireita.color() == Color.BLACK:
-#           robo.drive(2, 300)
+def ajuste_esquerda():
+    if sensorCorEsquerda.color() == Color.BLACK:
+        robo.drive(2, -300)
 
 def sensorEsquerdaTeste():
     #print('Sensor direito : ',sensorCorDireita.color())
-    if (sensorCorEsquerda.color() == Color.GREEN) and (sensorCorDireita.color() == Color.GREEN):
+    if sensorCorEsquerda.color() == Color.BLACK:
+        robo.drive(2,-300)
+    elif (sensorCorEsquerda.color() == Color.GREEN) and (sensorCorDireita.color() == Color.GREEN):
         wait(0.50)
         robo.straight(0.15)
         if (sensorCorEsquerda.color() == Color.GREEN) and (sensorCorDireita.color() == Color.GREEN):
             meiaVoltaDoisVerde()
-    elif sensorCorEsquerda.color() == Color.GREEN:#CURVA 90 TESTEAAAAAAAAAAAAAAAAAAA
-        robo.turn(15)
-        print('curvou')
-        if sensorCorEsquerda.color() == Color.GREEN:
-            c=1
-            robo.straight(0)
-            while sensorCorEsquerda.color() != Color.WHITE and sensorCorDireita.color() != Color.WHITE:
-                robo.drive(10,0)
-            robo.straight(0)
+    #elif sensorCorEsquerda.color() == Color.GREEN and sensorCorDireita.color() != Color.GREEN:
+    #    while sensorCorEsquerda.color() == Color.GREEN
 
 
 def sensorDireitaTeste():
@@ -71,18 +60,24 @@ def sensorDireitaTeste():
         if (sensorCorEsquerda.color() == Color.GREEN) and (sensorCorDireita.color() == Color.GREEN):
             meiaVoltaDoisVerde()
 
+#FUNFOUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU
+
+
     elif sensorCorDireita.color() == Color.GREEN:#CURVA 90 TESTEAAAAAAAAAAAAAAAAAAA
-        robo.turn(15) 
-#        print(sensorCorDireita.color())
-        if sensorCorDireita.color() == Color.YELLOW:
-            while sensorCorDireita.color() != Color.GREEN or sensorCorDireita.color() == Color.BLACK:
-                robo.straight(1)
-        if sensorCorDireita.color() == Color.GREEN:
+        robo.turn(15) #<-- ajusta a angulação para testar se é verde TRUE
+        print(sensorCorDireita.color())
+        if sensorCorDireita.color() == Color.BLACK:#<-- se for preto vai ajustar
+            ajuste_direita()
+        elif sensorCorDireita.color() == Color.YELLOW:
+            while sensorCorDireita.color() != Color.GREEN:
+                robo.drive(5,0)
+        elif sensorCorDireita.color() == Color.GREEN:#<-- se for verde vai fazer a curva de 90
             while sensorCorDireita.color() != Color.WHITE:
                 robo.straight(5)
+            
             while sensorCorDireita.color() != Color.BLACK:
-                robo.turn(20)
-            robo.straight(0)
+                robo.turn(10)
+
 #-----------------------------------seguindo linha [ok]---------------------------------------------------
 
 while True:  
@@ -99,5 +94,3 @@ while True:
     elif (sensorCorDireita.color() != Color.WHITE):# <- se sensor esquerda branco e sensor direito preto vira pra direita
         #print('TESTE2: Esquerda: ', sensorCorEsquerda.color(),'     Direita: ', sensorCorDireita.color())#relatorio de cor
         sensorDireitaTeste()
-        wait(3)
-        #print('sensorCorDireita =', sensorCorDireita.color())
