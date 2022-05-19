@@ -23,24 +23,33 @@ print('executou')
 ## -----------------------------------curvas no verde[teste]-------------------------------------------------
 def meiaVoltaDoisVerde():
     robo.straight(0)
-    robo.turn(400)
+    while sensorCorEsquerda.color() != Color.BLACK:
+        robo.drive(0,50)
+
+#def curva90Esquerda():
+
 
 def sensorEsquerdaTeste():
-    print('Sensor direito : ',sensorCorDireita.color())
+    #print('Sensor direito : ',sensorCorDireita.color())
     if sensorCorEsquerda.color() == Color.BLACK:
-            robo.drive(1,225)
+        robo.drive(2,-300)
     elif (sensorCorEsquerda.color() == Color.GREEN) and (sensorCorDireita.color() == Color.GREEN):
         wait(0.50)
+        robo.straight(0.15)
         if (sensorCorEsquerda.color() == Color.GREEN) and (sensorCorDireita.color() == Color.GREEN):
             meiaVoltaDoisVerde()
+    #elif sensorCorEsquerda.color() == Color.GREEN and sensorCorDireita.color() != Color.GREEN:
+    #    while sensorCorEsquerda.color() == Color.GREEN
+
+                
 
 def sensorDireitaTeste():
-    print('Sensor esquerda : ',sensorCorEsquerda.color())
+    #Print('Sensor esquerda : ',sensorCorEsquerda.color())
     if sensorCorDireita.color() == Color.BLACK:
-            robo.drive(1, -225)
-    elif (sensorCorEsquerda
-    .color() == Color.GREEN) and (sensorCorDireita.color() == Color.GREEN):
+        robo.drive(2, 300)
+    elif (sensorCorEsquerda.color() == Color.GREEN) and (sensorCorDireita.color() == Color.GREEN):
         wait(0.50)
+        robo.straight(0.15)
         if (sensorCorEsquerda.color() == Color.GREEN) and (sensorCorDireita.color() == Color.GREEN):
             meiaVoltaDoisVerde()
 #-----------------------------------seguindo linha [ok]---------------------------------------------------
