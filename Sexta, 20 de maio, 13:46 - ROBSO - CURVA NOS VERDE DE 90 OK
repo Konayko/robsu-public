@@ -1,0 +1,114 @@
+#!/usr/bin/env pybricks-micropython
+from pybricks.hubs import EV3Brick
+from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
+                                 InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.parameters import Port, Stop, Direction, Button, Color
+from pybricks.tools import wait, StopWatch, DataLog
+from pybricks.robotics import DriveBase
+from pybricks.media.ev3dev import SoundFile, ImageFile
+
+# objeto ev3
+ev3 = EV3Brick()
+
+#inicando motores
+motorEsquerdo = Motor(Port.A) # <- Declara motor esquerdo
+motorDireito = Motor(Port.B) # <- Declara motor direito
+
+#iniciando sensores de cor
+sensorCorEsquerda = ColorSensor(Port.S1) # <- Declara sensor esquerdo
+sensorCorDireita = ColorSensor(Port.S2) # <- Delcara sensor direito
+#inicia DriveBase
+robo = DriveBase(motorEsquerdo, motorDireito, wheel_diameter=4.70, axle_track=9.80) # <- Declara base do robo
+
+print('executou')
+## -----------------------------------curvas no verde[teste]-------------------------------------------------
+#meia volta
+def meiaVoltaDoisVerde():
+    robo.straight(0)
+    while sensorCorEsquerda.color() != Color.BLACK:
+        robo.drive(0,50)
+
+#ajuste de preto direito
+def ajuste_direita():
+    if sensorCorDireita.color() == Color.BLACK:
+        robo.drive(2, 300)
+#ajuste de preto esquerdo
+def ajuste_esquerda():
+    if sensorCorEsquerda.color() == Color.BLACK:
+        robo.drive(2, -300)
+#segue reto quando dois sensores forem pretos
+def seguir_reto_dois_petro():
+    while sensorCorDireita.color() != Color.BLACK and sensorCorEsquerda.color() != Color.BLACK:
+        robo.drive(3,0)
+    robo.straight(2)
+    
+#sensor esquerdo testes
+def sensorEsquerdaTeste():
+    #direito == preto | esquerdo == preto
+    if (sensorCorDireita.color() == Color.BLACK) and (sensorCorEsquerda.color() == Color.BLACK):
+        seguir_reto_dois_petro()
+    #esquerdo == preto | direita != preto
+    elif (sensorCorEsquerda.color() == Color.BLACK) and (sensorCorDireita.color() != Color.BLACK):
+        ajuste_esquerda()
+    #esquerdo == verde | direito == verde
+    elif (sensorCorEsquerda.color() == Color.GREEN) and (sensorCorDireita.color() == Color.GREEN):
+        wait(0.50)
+        robo.straight(0.15)
+        if (sensorCorEsquerda.color() == Color.GREEN) and (sensorCorDireita.color() == Color.GREEN):
+            meiaVoltaDoisVerde()
+    elif sensorCorEsquerda.color() == Color.GREEN:
+        robo.turn(-15)
+        if sensorCorEsquerda.color() == Color.BLACK:
+            ajuste_esquerda()
+        elif sensorCorEsquerda.color() == Color.YELLOW:
+            while sensorCorEsquerda.color() != Color.GREEN or sensorCorEsquerda.color() != Color.BLACK:
+                robo.drive(5,0)
+        elif sensorCorEsquerda.color() == Color.GREEN:
+            while sensorCorEsquerda.color() != Color.WHITE:
+                robo.straight(5)
+            while sensorCorEsquerda.color() != Color.BLACK:
+                robo.turn(-10)
+
+#teste sensor direito
+def sensorDireitaTeste():
+    #direito == preto | esquerdo == preto 
+    if (sensorCorDireita.color() == Color.BLACK) and (sensorCorEsquerda.color() == Color.BLACK):
+        seguir_reto_dois_petro()
+    #direito == preto | esquerdo != preto    
+    elif (sensorCorDireita.color() == Color.BLACK) and (sensorCorEsquerda.color() != Color.BLACK):
+        ajuste_direita()
+    #esquerdo == verde | direito == verde
+    elif (sensorCorEsquerda.color() == Color.GREEN) and (sensorCorDireita.color() == Color.GREEN):
+        wait(0.50)
+        robo.straight(0.20)
+        if (sensorCorEsquerda.color() == Color.GREEN) and (sensorCorDireita.color() == Color.GREEN):
+            meiaVoltaDoisVerde()
+    #direito == verde
+    elif sensorCorDireita.color() == Color.GREEN:
+        robo.turn(15) #<-- ajusta a angulação para testar se é verde TRUE!
+        if sensorCorDireita.color() == Color.BLACK:#<-- se for preto vai ajustar
+            ajuste_direita()
+        elif sensorCorDireita.color() == Color.YELLOW:# <- se for amarelo vai ajustar para detectar verde ou preto
+            while sensorCorDireita.color() != Color.GREEN or sensorCorDireita.color() != Color.BLACK:
+                robo.drive(5,0)
+        elif sensorCorDireita.color() == Color.GREEN:#<-- quando confirma verde, vai executar
+            while sensorCorDireita.color() != Color.WHITE:
+                robo.straight(5)
+            while sensorCorDireita.color() != Color.BLACK:
+                robo.turn(10)
+
+
+#-----------------------------------seguindo linha [ok]---------------------------------------------------
+
+while True:  
+    # esquerda == branco | direito == branco
+    if (sensorCorEsquerda.color() == Color.WHITE) and (sensorCorDireita.color() == Color.WHITE): # <- se sensor esquero e direio brancos, seguem reto
+        robo.drive(5, 0)# <- acelera reto
+        
+    #teste esquerda, esquerda != branco
+    elif sensorCorEsquerda.color() != Color.WHITE:# <- se sensor esquerdo preto e sensor direito branco, vira pra esquerda
+        sensorEsquerdaTeste()
+
+    #teste direita, direita != branco
+    elif (sensorCorDireita.color() != Color.WHITE):# <- se sensor esquerda branco e sensor direito preto vira pra direita
+        sensorDireitaTeste()
