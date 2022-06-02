@@ -1,0 +1,94 @@
+#!/usr/bin/env pybricks-micropython
+from pybricks.hubs import EV3Brick
+from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
+                                 InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.parameters import Port, Stop, Direction, Button, Color
+from pybricks.tools import wait, StopWatch, DataLog
+from pybricks.robotics import DriveBase
+from pybricks.media.ev3dev import SoundFile, ImageFile
+
+#inicando motores
+motorEsquerdo = Motor(Port.A)
+motorDireito = Motor(Port.B)
+
+#inicia DriveBase
+robo = DriveBase(motorEsquerdo, motorDireito, wheel_diameter=4.70, axle_track=9.80)
+#iniciando sensores de cor
+sensorCorEsquerda = ColorSensor(Port.S1)
+sensorCorDireita = ColorSensor(Port.S2)
+
+#iniciando ultrassônico
+sensorUltrassonico = UltrasonicSensor(Port.S3)
+
+print('executou')
+
+#----------------------------------------funções-----------------------------------------------------
+#alinhar sensor esquerdo
+def alinharEsquerda():
+    while sensorCorEsquerda.color() != Color.WHITE:# enquanto sensor da equerda for diferente de branco turn -25
+        robo.turn(-30)
+
+#alinhar sensor direito
+def alinharDireito(): #corrigir aq
+    while sensorCorDireita.color() != Color.WHITE:
+        robo.turn(30)
+
+#meia volta dois verde
+def meiaVolta():
+    #while sensorCorDireita.color() != Color.GREEN:
+    #    robo.turn(-15)
+    while sensorCorEsquerda.color() == Color.BLACK:
+        robo.turn(-15)
+
+#sensor esquerdo
+def sensorEsquerdoTeste():
+    #dois verde
+    if sensorCorEsquerda.color() == Color.GREEN and sensorCorDireita.color() == Color.GREEN:
+        meiaVolta()
+
+    #sensor = preto
+    if sensorCorEsquerda.color() == Color.BLACK:
+        alinharEsquerda()
+    
+    #sensor = verde
+    if sensorCorEsquerda.color() == Color.GREEN:
+        robo.turn(-15)
+        if sensorCorEsquerda.color() == Color.GREEN:
+            while sensorCorEsquerda.color() != Color.WHITE:
+                robo.straight(5)
+            while sensorCorEsquerda.color() != Color.BLACK:
+                robo.turn(-10)
+
+#sensor direito
+def sensorDireitoTeste():
+    #dois verde
+    if sensorCorDireita.color() == Color.GREEN and sensorCorEsquerda.color() == Color.GREEN:
+        meiaVolta()
+
+    #sensor = preto
+    if sensorCorDireita.color() == Color.BLACK:
+        alinharDireito()
+
+    #sensor = verde
+    if sensorCorDireita.color() == Color.GREEN:
+        robo.turn(15)
+        if sensorCorDireita.color() == Color.GREEN:
+            while sensorCorDireita.color() != Color.WHITE:
+                robo.straight(5)
+            while sensorCorDireita.color() != Color.BLACK:
+                robo.turn(10)
+
+
+#----------------------------------------pograma principal---------------------------------------------------
+while True:
+    #velocidade do motor
+    robo.drive(7, 0)
+
+    #sensor esquerdo != verde
+    if sensorCorEsquerda.color() != Color.WHITE:
+        sensorEsquerdoTeste()
+
+        
+    #sensor direito != verde
+    if sensorCorDireita.color() != Color.WHITE:
+        sensorDireitoTeste()
