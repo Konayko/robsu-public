@@ -1,0 +1,109 @@
+#!/usr/bin/env pybricks-micropython
+from pybricks.hubs import EV3Brick
+from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
+                                 InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.parameters import Port, Stop, Direction, Button, Color
+from pybricks.tools import wait, StopWatch, DataLog
+from pybricks.robotics import DriveBase
+from pybricks.media.ev3dev import SoundFile, ImageFile
+
+#inicando motores
+motorEsquerdo = Motor(Port.A,positive_direction=Direction.COUNTERCLOCKWISE , gears=None)
+motorDireito = Motor(Port.B,positive_direction=Direction.COUNTERCLOCKWISE , gears=None)
+
+#inicia DriveBase
+robo = DriveBase(motorEsquerdo, motorDireito, wheel_diameter=45, axle_track=190)
+#iniciando sensores de cor
+sensorCorEsquerda = ColorSensor(Port.S1)
+sensorCorDireita = ColorSensor(Port.S2)
+#listas
+listaCorEsquerda = []
+listaCorDireita = []
+
+#____________________________________________________________________________________________________
+
+def modaCor(lista):
+
+#posições
+#0 preto
+#1 verde
+
+    cont = [0,0] #<- contador
+
+    for x in lista:# <- for que conta a quantidade de valor lido
+        if x == 'Color.BLACK':
+            cont[0] += 1
+        elif x == 'Color.GREEN':
+            cont[1] += 1
+
+    maxValor = max(cont)# <- maior valor no cont
+    index = cont.index(maxValor)# <- index
+
+    print('0 = preto\n'+
+    '1 = verde')
+
+    print('index {} \n'.format(index))
+
+    return index #<- retorna o index da cor
+
+
+def sensorEsquerdoTeste(alpha):
+
+    if alpha == 0:#<- alpha == preto
+        robo.straight(2)
+        while sensorCorEsquerda.color() != Color.WHITE:
+            robo.turn(-10)
+
+    elif alpha == 1:#<- alpha == verde
+        while sensorCorEsquerda.color() != Color.WHITE:
+            robo.drive(50,0)
+        robo.straight(15)
+        while sensorCorEsquerda.color() != Color.BLACK:
+            robo.turn(-10)
+
+
+def sensorDireitoTeste(alpha):
+
+    if alpha == 0:#<- alpha == preto
+        robo.straight(2)
+        while sensorCorDireita.color() != Color.WHITE:
+            robo.turn(10)
+
+    elif alpha == 1:#<- alpha == verde
+        while sensorCorDireita.color() != Color.WHITE:
+            robo.drive(50,0)
+        robo.straight(15)
+        while sensorCorDireita.color() != Color.BLACK:
+            robo.turn(10)
+
+
+while True:
+    x=0
+    robo.drive(50,0)
+
+    if sensorCorEsquerda.color() != Color.WHITE:
+        print('Esquerda')
+        wait(100)
+        robo.drive(0,0)
+        while x<=100:
+            x += 1
+            listaCorEsquerda.append(str(sensorCorEsquerda.color()))#<- adiciona as cores lidas na lista
+        #print(listaCorEsquerda)
+        resultEsquerda = modaCor(listaCorEsquerda)#<- return do modaCor
+        sensorEsquerdoTeste(resultEsquerda)
+
+    
+    if sensorCorDireita.color() != Color.WHITE:
+        print('Direita')
+        wait(100)
+        robo.drive(0,0)
+        while x<=100:
+            x += 1
+            listaCorDireita.append(str(sensorCorDireita.color()))#<- adiciona as cores lidas na lista
+        #print(listaCorDireita)
+        resultDireita = modaCor(listaCorDireita)#<- return do modaCor
+        sensorDireitoTeste(resultDireita)
+
+       
+
+
