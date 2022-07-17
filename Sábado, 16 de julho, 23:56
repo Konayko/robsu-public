@@ -1,0 +1,160 @@
+PRETO TESTADO
+#!/usr/bin/env pybricks-micropython
+from pybricks.hubs import EV3Brick
+from pybricks.ev3devices import (Motor, TouchSensor, ColorSensor,
+InfraredSensor, UltrasonicSensor, GyroSensor)
+from pybricks.parameters import Port, Stop, Direction, Button, Color
+from pybricks.tools import wait, StopWatch, DataLog
+from pybricks.robotics import DriveBase
+from pybricks.media.ev3dev import SoundFile, ImageFile
+
+inicando motores
+motorEsquerdo = Motor(Port.A, positive_direction=Direction.COUNTERCLOCKWISE, gears=None)
+motorDireito = Motor(Port.B, positive_direction=Direction.COUNTERCLOCKWISE, gears=None)
+
+inicia DriveBase
+robo = DriveBase(motorEsquerdo, motorDireito, wheel_diameter=45, axle_track=190)
+
+iniciando sensores de cor
+sensorCorEsquerda = ColorSensor(Port.S1)
+sensorCorDireita = ColorSensor(Port.S2)
+
+iniciando ultrassônico
+sensorUltrassonico = UltrasonicSensor(Port.S3)
+print(sensorCorEsquerda.color(), sensorCorEsquerda.reflection())
+print(sensorCorDireita.color(), sensorCorDireita.reflection())
+print(sensorCorEsquerda.rgb(), sensorCorDireita.rgb())
+
+brancomax = (100, 100, 100)
+brancomin = (65, 65, 80)
+
+pretomax = (40, 40, 60)
+pretomin = (0, 0, 0)
+
+verdemax = (30, 60, 60)
+verdemin = (10, 30, 30)
+
+maximo = [brancomax, pretomax, verdemax]
+minimo = [brancomin, pretomin, verdemin]
+
+CorE = Color.WHITE
+CorD = Color.WHITE
+
+----------------------------------------funções-----------------------------------------------------
+alinhar sensor esquerdo
+def alinharEsquerda():
+while sensorCorEsquerda.color() != Color.WHITE:
+robo.turn(-12)
+
+alinhar sensor direito
+def alinharDireito():
+while sensorCorDireita.color() != Color.WHITE:
+robo.turn(12)
+
+meia volta dois verde
+def meiaVolta():
+# while sensorCorDireita.color() != Color.GREEN:
+# robo.turn(-15)
+robo.turn(180)
+
+def virar90(direcao):
+# sensor = verde
+# ESQUERDA = NEGATIVO
+# DIREITA = POSITIVO
+if sensorCorDireita.color() == Color.GREEN:
+robo.turn(7 * direcao)
+if sensorCorDireita.color() == Color.GREEN:
+while sensorCorDireita.color() != Color.WHITE:
+robo.straight(25)
+while sensorCorDireita.color() != Color.BLACK:
+robo.turn(10 * direcao)
+
+dar volta em objeto AJEITAR AQ
+def voltaObjeto():
+while sensorCorDireita.color() != Color.BLACK:
+while sensorUltrassonico.distance() < 75:
+robo.turn(-100)
+robo.straight()
+robo.drive(7, 100)
+def sensorEsquerdoTeste(maximo, minimo, rgbe):
+cores = {0: Color.WHITE, 1: Color.BLACK, 2: Color.GREEN}
+for i in range(3):
+if (rgbe[0] <= maximo[i][0]) and (
+rgbe[0] >= minimo[i][0]): # teste para checar se o valor vermelho está de acordo com o esperado
+if (rgbe[1] <= maximo[i][1]) and (
+rgbe[1] >= minimo[i][1]): # teste para checar se o valor verde está de acordo com o esperado
+if (rgbe[2] <= maximo[i][2]) and (
+rgbe[2] >= minimo[i][2]): # teste para checar se o valor azul está de acordo com o esperado
+CorE = cores.get(i)
+return CorE
+break
+
+def sensorDireitoTeste(maximo, minimo, rgbd):
+cores = {0: Color.WHITE, 1: Color.BLACK, 2: Color.GREEN}
+for i in range(3):
+if (rgbd[0] <= maximo[i][0]) and (
+rgbd[0] >= minimo[i][0]): # teste para checar se o valor vermelho está de acordo com o esperado
+if (rgbd[1] <= maximo[i][1]) and (
+rgbd[1] >= minimo[i][1]): # teste para checar se o valor verde está de acordo com o esperado
+if (rgbd[2] <= maximo[i][2]) and (
+rgbd[2] >= minimo[i][2]): # teste para checar se o valor azul está de acordo com o esperado
+CorD = cores.get(i)
+return CorD
+break
+
+----------------------------------------PROGRAMA PRINCIPAL---------------------------------------------------
+while True:
+# velocidade do motor
+robo.drive(100, 0)
+
+# sensor esquerdo != branco
+
+if sensorCorEsquerda.color() != Color.WHITE:
+
+    robo.stop()
+
+    rgbe = sensorCorEsquerda.rgb()
+
+    CorE = sensorEsquerdoTeste(maximo, minimo, rgbe)
+
+# sensor direito != branco
+
+if sensorCorDireita.color() != Color.WHITE:
+
+    robo.stop()
+
+    rgbd = sensorCorDireita.rgb()
+
+    CorD = sensorDireitoTeste(maximo, minimo, rgbd)
+
+
+
+# ---DECISÃO VERDE---#
+
+if (CorE == Color.GREEN) and (CorD == Color.GREEN):
+
+    meiaVolta()
+
+if (CorE == Color.GREEN):
+
+    virar90(-1)
+
+if (CorD == Color.GREEN):
+
+    virar90(1)
+
+
+
+# ---DECISÃO PRETO---#
+
+if CorE == Color.BLACK:
+
+    alinharEsquerda()
+
+if CorD == Color.BLACK:
+
+    alinharDireito()
+
+#ultrasonico
+if sensorUltrassonico.distance() < 150:
+voltaObjeto()
